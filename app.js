@@ -15,7 +15,7 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const session = require("express-session");
-const MongoStore = require('connect-mongo').default;
+const MongoStore = require('connect-mongo');
 
 const User = require("./models/user.js");
 const listings = require("./routes/listing.js");
@@ -44,12 +44,13 @@ async function main(){
   }
 
 
-const store = MongoStore.create({
+const store = new MongoStore({
     mongoUrl : dburl,
     crypto : {
         secret :process.env.SECRET_STRING,
     },
     touchAfter : 24*60*60,
+    collection : "sessions"
 })
 
 store.on("error",()=>{
@@ -57,7 +58,7 @@ store.on("error",()=>{
 })
 
 const sessionOptions = {
-    store,
+    store:  store,
     secret : process.env.SECRET_STRING,
     resave : false,
     saveUninitialized : true,
